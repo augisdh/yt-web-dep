@@ -2,7 +2,7 @@
   <div @click="closeFormOut" class="contact-wrap l-spacing-sm">
     <div @click="closeForm" class="close-btn-div"></div>
     <div class="contact-form-box margin-sides">
-      <form class="form" method="POST" action="https://youngtalent.herokuapp.com/email" novalidate>
+      <form class="form" novalidate>
         <div class="form-header">
           <div class="form-header-i-box">
             <h4>
@@ -19,18 +19,18 @@
           </div>
         </div>
         <div v-if="sendSuccess === false" class="form-inputs">
-          <input class="inputName" :class="{'in-valid': validName === false}" type="text" name="name" id="name" placeholder="姓名" required>
-          <input class="inputNumber" :class="{'in-valid': validNumber === false}" type="text" name="number" id="number" placeholder="电话" required>
-          <input class="inputWechat" :class="{'in-valid': validWechat === false}" type="text" name="wechat" id="wechat" placeholder="微信号" required>
-          <input class="inputEmail" :class="{'in-valid': validEmail === false}" type="email" name="email" id="email" placeholder="邮箱" required>
-          <input class="inputMsg" :class="{'in-valid': validMsg === false}" type="text" name="msg" id="msg" placeholder="信息" required>
+          <input class="inputName" :class="{'in-valid': validName === false}" type="text" name="name" id="name" v-model="formName" placeholder="姓名" required>
+          <input class="inputNumber" :class="{'in-valid': validNumber === false}" type="text" name="number" id="number" v-model="formNumber" placeholder="电话" required>
+          <input class="inputWechat" :class="{'in-valid': validWechat === false}" type="text" name="wechat" id="wechat" v-model="formWechat" placeholder="微信号" required>
+          <input class="inputEmail" :class="{'in-valid': validEmail === false}" type="email" name="email" id="email" v-model="formEmail" placeholder="邮箱" required>
+          <input class="inputMsg" :class="{'in-valid': validMsg === false}" type="text" name="msg" id="msg" v-model="formMsg" placeholder="信息" required>
           <p class="p-text">
             * 专业老师会尽快与你取得联系。您也可以通过网站上提供的地址、
             电话或邮箱直接联系我们
           </p>
         </div>
         <div v-if="sendSuccess === false" class="form-btns">
-          <button @click="sendMessage" class="send-btn" type="submit">提交信息</button>
+          <button @click="sendMessage" class="send-btn" type="button">提交信息</button>
           <button @click="closeForm" class="close-btn" type="button">关闭窗口</button>
         </div>
         <div v-if="sendSuccess === true" class="form-msg">
@@ -63,12 +63,17 @@ export default {
   data () {
     return {
       sendSuccess: false,
+      contactFormValid: false,
       validNumber: null,
       validEmail: null,
       validName: null,
       validWechat: null,
       validMsg: null,
-      contactFormValid: false
+      formName: '',
+      formNumber: '',
+      formWechat: '',
+      formEmail: '',
+      formMsg: ''
     }
   },
   methods: {
@@ -82,18 +87,16 @@ export default {
     checkRegexValidation () {
       const checkEmail = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/g
       const checkNumber = /^\+?-?\d+$/g
-      const formNumber = document.querySelector('.inputNumber').value
-      const formEmail = document.querySelector('.inputEmail').value
-      const isValidNumber = formNumber.match(checkNumber)
-      const isValidEmail = formEmail.match(checkEmail);
+      const isValidNumber = this.formNumber.match(checkNumber)
+      const isValidEmail = this.formEmail.match(checkEmail);
 
       (isValidNumber) ? this.validNumber = true : this.validNumber = false;
       (isValidEmail) ? this.validEmail = true : this.validEmail = false
     },
     checkOtherValidation () {
-      (document.querySelector('.inputName').value !== '') ? this.validName = true : this.validName = false;
-      (document.querySelector('.inputWechat').value !== '') ? this.validWechat = true : this.validWechat = false;
-      (document.querySelector('.inputMsg').value !== '') ? this.validMsg = true : this.validMsg = false
+      (this.formName !== '') ? this.validName = true : this.validName = false;
+      (this.formWechat !== '') ? this.validWechat = true : this.validWechat = false;
+      (this.formMsg !== '') ? this.validMsg = true : this.validMsg = false
     },
     sendMessage () {
       this.checkRegexValidation()
@@ -102,10 +105,25 @@ export default {
 
       if (this.contactFormValid === true) {
         event.preventDefault()
-        this.sendSuccess = true
-        setTimeout(() => {
-          this.closeForm()
-        }, 5000)
+        fetch('https://youngtalent.herokuapp.com/email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({name: this.formName, number: this.formNumber, wechat: this.formWechat, maillAddr: this.formEmail, msg: this.formMsg})
+        })
+          .then((res) => {
+            if (res.status === 200) {
+              this.sendSuccess = true
+              setTimeout(() => {
+                this.closeForm()
+              }, 5000)
+            }
+          })
+          .catch((err) => {
+            console.log(err)
+            this.sendSuccess = false
+          })
       } else {
         this.sendSuccess = false
       }
