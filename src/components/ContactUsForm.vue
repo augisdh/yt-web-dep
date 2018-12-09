@@ -109,10 +109,13 @@ export default {
 
         fetch('https://youngtalent.herokuapp.com/email', {
           method: 'POST',
-          headers: new Headers(),
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
           body: JSON.stringify({name: name, number: number, wechat: wechat, email: email, msg: msg})
-        }).then((res) => res.json())
-          .then((data) => {
+        })
+          .then((res) => {
             this.sendSuccess = true
             setTimeout(() => {
               this.closeForm()
