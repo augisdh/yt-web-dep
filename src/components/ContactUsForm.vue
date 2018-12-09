@@ -2,7 +2,7 @@
   <div @click="closeFormOut" class="contact-wrap l-spacing-sm">
     <div @click="closeForm" class="close-btn-div"></div>
     <div class="contact-form-box margin-sides">
-      <form class="form" novalidate>
+      <form class="form" method="POST" action="https://youngtalent.herokuapp.com/email" novalidate>
         <div class="form-header">
           <div class="form-header-i-box">
             <h4>
@@ -30,7 +30,7 @@
           </p>
         </div>
         <div v-if="sendSuccess === false" class="form-btns">
-          <button @click="sendMessage" class="send-btn" type="button">提交信息</button>
+          <button @click="sendMessage" class="send-btn" type="submit">提交信息</button>
           <button @click="closeForm" class="close-btn" type="button">关闭窗口</button>
         </div>
         <div v-if="sendSuccess === true" class="form-msg">
@@ -56,6 +56,8 @@
 </template>
 
 <script>
+// import axios from 'axios'
+
 export default {
   name: 'ContactUsForm',
   data () {
@@ -100,31 +102,12 @@ export default {
 
       if (this.contactFormValid === true) {
         event.preventDefault()
-
-        let name = document.getElementById('name').value
-        let number = document.getElementById('number').value
-        let wechat = document.getElementById('wechat').value
-        let email = document.getElementById('email').value
-        let msg = document.getElementById('msg').value
-
-        fetch('https://youngtalent.herokuapp.com/email', {
-          method: 'POST',
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({name: name, number: number, wechat: wechat, email: email, msg: msg})
-        })
-          .then((res) => {
-            this.sendSuccess = true
-            setTimeout(() => {
-              this.closeForm()
-            }, 5000)
-          })
-          .catch((err) => {
-            this.sendSuccess = false
-            console.log(err)
-          })
+        this.sendSuccess = true
+        setTimeout(() => {
+          this.closeForm()
+        }, 5000)
+      } else {
+        this.sendSuccess = false
       }
     }
   }
