@@ -5,7 +5,7 @@
       <div class="courses-head">
         <div class="courses-head-img d-flex-center">
           <div class="port-head-wrapper container margin-sides">
-            <img src="./assets/coursespage/portfolio.jpg" alt="">
+            <!-- <img src="./assets/coursespage/portfolio.jpg" alt=""> -->
           </div>
         </div>
         <div class="clear-head-bottom"></div>
